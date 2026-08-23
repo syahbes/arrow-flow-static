@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arrow Flow — A calm arrow-escape puzzle</title>
-  <meta name="description" content="Arrow Flow is a calm arrow-escape puzzle for Android. Tap an arrow, it slides off the board — unless something is in its way. A daily puzzle, a streak worth keeping, and no timers.">
-  <meta name="theme-color" content="#161b18">
+  <title>Arrow Flow — An arrow escape puzzle</title>
+  <meta name="description" content="Arrow Flow is a calm arrow escape puzzle for Android. Tap an arrow, it slides off the board — unless something is in its way. A daily puzzle, a streak worth keeping, and no timers.">
+  <meta name="theme-color" content="#161b18" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#eef1ec" media="(prefers-color-scheme: light)">
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/icon-1024.png">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Arrow Flow — A calm arrow-escape puzzle">
+  <meta property="og:title" content="Arrow Flow — An arrow escape puzzle">
   <meta property="og:description" content="Tap an arrow, it slides off the board — unless something is in its way. A daily puzzle, a streak worth keeping, and no timers.">
   <meta property="og:image" content="https://syahbes.github.io/arrow-flow-static/assets/icon-1024.png">
   <meta name="twitter:card" content="summary">
 
-  <link rel="stylesheet" href="fonts.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -23,15 +23,18 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="topbar">
+  <div class="topbar-inner">
   <a class="brand" href="#main">
     <img src="assets/icon-1024.png" alt="" class="brand-icon" width="32" height="32">
-    <span class="brand-name">Arrow Flow</span>
+    <span class="brand-name">Arrow <em>Flow</em></span>
   </a>
   <nav class="topnav">
     <a href="#how">How it plays</a>
     <a href="#features">Features</a>
+    <a href="#themes">Themes</a>
     <a href="privacy-policy.html">Privacy</a>
   </nav>
+  </div>
 </header>
 
 <main id="main">
@@ -41,60 +44,100 @@
   <!-- ------------------------------------------------------------------ -->
   <section class="hero">
     <div class="hero-copy">
-      <img src="assets/icon-1024.png" alt="Arrow Flow app icon: cream arrows winding across a dark board" class="hero-icon" width="128" height="128">
-      <h1 class="hero-title">Arrow Flow</h1>
-      <p class="hero-tagline">A calm arrow-escape puzzle</p>
+      <img src="assets/icon-1024.png" alt="Arrow Flow app icon: cream and gold arrows winding across a dark board" class="hero-icon" width="96" height="96">
+      <h1 class="hero-title">Arrow <em>Flow</em></h1>
+      <p class="hero-tagline">An arrow escape puzzle</p>
       <p class="hero-lede">
         The board is a tangle of arrows. Tap one and it slides out along its own
-        path &mdash; unless another arrow crosses its way out. Untangle the whole
+        path &mdash; unless another arrow crosses its way. Untangle the whole
         board, one unhurried tap at a time.
       </p>
 
       <div class="cta-row">
-        <span class="btn btn-primary is-inert" aria-disabled="true">
+        <span class="btn is-inert" aria-disabled="true">
           <span class="btn-sub">Coming soon to</span>
-          <span class="btn-main">Google Play</span>
+          <span>Google Play</span>
         </span>
-        <a class="btn btn-outline" href="#how">See how it plays</a>
+        <a class="btn btn-secondary" href="#how">See how it plays</a>
       </div>
 
-      <ul class="hero-badges">
+      <ul class="hero-chips">
         <li>Daily puzzle</li>
         <li>No timers</li>
+        <li>No full-screen ads</li>
         <li>Android</li>
       </ul>
     </div>
 
-    <!-- Live demo: the same arrow geometry the game draws, solving a board. -->
-    <figure class="hero-demo">
-      <div class="demo-frame">
-        <canvas id="demo" width="168" height="168"
-          aria-label="Animation of four arrows sliding off a puzzle board, each waiting for the one blocking it to leave first"></canvas>
+    <!-- The demo is the game's play screen, not a picture of it: the same
+         palette, the same HUD, and a board drawn with the app's own arrow
+         geometry (see main.js). -->
+    <figure class="hero-device">
+      <div class="device">
+        <div class="device-screen">
+          <div class="hud-rail"><span id="demo-progress"></span></div>
+
+          <div class="hud">
+            <div class="hud-left">
+              <span class="hud-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5 8.5 12l6 6.5"/></svg>
+              </span>
+              <span class="hud-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+              </span>
+              <span class="hud-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9.5 4v16M14.5 4v16M4 9.5h16M4 14.5h16"/></svg>
+              </span>
+            </div>
+
+            <div class="hud-center">
+              <span class="hud-name">Puzzle #214</span>
+              <span class="hud-hearts" aria-hidden="true">&hearts;&hearts;&hearts;</span>
+            </div>
+
+            <p class="hud-meta">
+              Taps <b class="tnum" id="demo-taps">0</b><br>4 arrows
+            </p>
+          </div>
+
+          <div class="boardwrap">
+            <canvas id="demo" width="168" height="168"
+              aria-label="Animation of four arrows sliding off a puzzle board, each waiting for the arrow blocking it to leave first"></canvas>
+          </div>
+        </div>
       </div>
-      <figcaption class="demo-caption">
-        <span class="demo-label">Escaped</span>
-        <span class="demo-count"><span id="demo-cleared">0</span>/4</span>
-      </figcaption>
+      <figcaption class="device-caption">Four arrows, one order that works.</figcaption>
     </figure>
   </section>
 
   <!-- ------------------------------------------------------------------ -->
   <!-- Rules                                                               -->
   <!-- ------------------------------------------------------------------ -->
-  <section id="how" class="rules" aria-label="How to play">
-    <h2 class="section-title">One rule. That&rsquo;s the whole game.</h2>
-    <div class="rules-grid">
-      <div class="rule">
-        <span class="rule-num">01</span>
-        <p>Tap an arrow. Its head leaves in a straight line, and the body follows the path behind it like a train on rails.</p>
+  <section id="how" class="band">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">One rule. That&rsquo;s the whole game.</h2>
+        <p class="section-sub">
+          Nothing to learn, everything to work out. The difficulty is in the
+          order, never in the controls.
+        </p>
       </div>
-      <div class="rule">
-        <span class="rule-num">02</span>
-        <p>If another arrow sits on that straight way out, it bumps and stays put. Clear the blocker first.</p>
-      </div>
-      <div class="rule">
-        <span class="rule-num">03</span>
-        <p>Empty the board. There is no clock &mdash; take the minute you need to see the order.</p>
+      <div class="rules-grid">
+        <div class="rule">
+          <span class="rule-num">01</span>
+          <h3>Tap an arrow</h3>
+          <p>Its head leaves in a straight line, and the body follows the path behind it like a train on rails.</p>
+        </div>
+        <div class="rule">
+          <span class="rule-num">02</span>
+          <h3>Blockers stay put</h3>
+          <p>If another arrow sits on that way out, the tap bumps and nothing moves. Clear the blocker first.</p>
+        </div>
+        <div class="rule">
+          <span class="rule-num">03</span>
+          <h3>Empty the board</h3>
+          <p>There is no clock. Take the minute you need to see the order, then watch the whole thing unwind.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -102,45 +145,92 @@
   <!-- ------------------------------------------------------------------ -->
   <!-- Features                                                            -->
   <!-- ------------------------------------------------------------------ -->
-  <section id="features" class="features">
-    <h2 class="section-title">Built to be quiet</h2>
-    <ul class="feature-grid">
-      <li class="card">
-        <h3>A calm design</h3>
-        <p>Flat surfaces, thin lines, a soft dot lattice. Nothing flashes, nothing nags, nothing races you.</p>
-      </li>
-      <li class="card">
-        <h3>A puzzle every day</h3>
-        <p>One fresh daily puzzle, the same one for everybody. A few minutes, then get on with your day.</p>
-      </li>
-      <li class="card">
-        <h3>A streak worth keeping</h3>
-        <p>Solve the daily puzzle to extend your streak, with an optional reminder if you like being nudged.</p>
-      </li>
-      <li class="card">
-        <h3>No timers</h3>
-        <p>No countdown, no par time, no pressure to move before you have worked it out.</p>
-      </li>
-      <li class="card">
-        <h3>Never a full-screen ad</h3>
-        <p>The free game carries a single banner at the bottom. No interstitials, no rewarded videos, ever.</p>
-      </li>
-      <li class="card">
-        <h3>One-time Premium</h3>
-        <p>A single purchase removes the banner for good. No subscription, no ads after that &mdash; yours forever.</p>
-      </li>
-    </ul>
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Built to be quiet</h2>
+        <p class="section-sub">
+          Flat surfaces, thin lines, a soft dot lattice. Nothing flashes,
+          nothing nags, nothing races you.
+        </p>
+      </div>
+      <ul class="feature-grid">
+        <li class="card">
+          <h3>A puzzle every day</h3>
+          <p>One fresh daily puzzle, the same one for everybody. A few minutes, then get on with your day.</p>
+        </li>
+        <li class="card">
+          <h3>A streak worth keeping</h3>
+          <p>Solve the daily to extend your streak, with an optional reminder if you like being nudged.</p>
+        </li>
+        <li class="card">
+          <h3>A campaign to work through</h3>
+          <p>Hand-built puzzles that grow with you, and stars for a solve that cost you nothing.</p>
+        </li>
+        <li class="card">
+          <h3>No timers</h3>
+          <p>No countdown, no par time, no pressure to move before you have worked it out.</p>
+        </li>
+        <li class="card">
+          <h3>Never a full-screen ad</h3>
+          <p>The free game carries a single banner at the bottom. No interstitials, no rewarded videos, ever.</p>
+        </li>
+        <li class="card">
+          <h3>One-time Premium</h3>
+          <p>A single purchase removes the banner for good. No subscription, no ads after that &mdash; yours forever.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------------ -->
+  <!-- Themes                                                              -->
+  <!-- ------------------------------------------------------------------ -->
+  <section id="themes" class="band">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="section-title">Four themes, all of them calm</h2>
+        <p class="section-sub">
+          Quiet Current is the house palette, in dark and light. Catppuccin
+          Mocha and Latte ship alongside it. Swap whenever, in Settings.
+        </p>
+      </div>
+      <ul class="theme-grid">
+        <li class="swatch t-dark">
+          <svg class="mini" viewBox="0 0 70 70" width="70" height="70" aria-hidden="true"><g class="mini-dots"><rect x="6.02" y="6.02" width="1.96" height="1.96"/><rect x="20.02" y="6.02" width="1.96" height="1.96"/><rect x="34.02" y="6.02" width="1.96" height="1.96"/><rect x="48.02" y="6.02" width="1.96" height="1.96"/><rect x="62.02" y="6.02" width="1.96" height="1.96"/><rect x="6.02" y="20.02" width="1.96" height="1.96"/><rect x="20.02" y="20.02" width="1.96" height="1.96"/><rect x="34.02" y="20.02" width="1.96" height="1.96"/><rect x="48.02" y="20.02" width="1.96" height="1.96"/><rect x="62.02" y="20.02" width="1.96" height="1.96"/><rect x="6.02" y="34.02" width="1.96" height="1.96"/><rect x="20.02" y="34.02" width="1.96" height="1.96"/><rect x="34.02" y="34.02" width="1.96" height="1.96"/><rect x="48.02" y="34.02" width="1.96" height="1.96"/><rect x="62.02" y="34.02" width="1.96" height="1.96"/><rect x="6.02" y="48.02" width="1.96" height="1.96"/><rect x="20.02" y="48.02" width="1.96" height="1.96"/><rect x="34.02" y="48.02" width="1.96" height="1.96"/><rect x="48.02" y="48.02" width="1.96" height="1.96"/><rect x="62.02" y="48.02" width="1.96" height="1.96"/><rect x="6.02" y="62.02" width="1.96" height="1.96"/><rect x="20.02" y="62.02" width="1.96" height="1.96"/><rect x="34.02" y="62.02" width="1.96" height="1.96"/><rect x="48.02" y="62.02" width="1.96" height="1.96"/><rect x="62.02" y="62.02" width="1.96" height="1.96"/></g><g class="mini-ink"><path d="M7 49 L7 21 L35 21" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="39.2" y="20.02" width="1.40" height="1.96"/><rect x="37.8" y="19.04" width="1.40" height="3.92"/><rect x="36.4" y="18.13" width="1.40" height="5.74"/><rect x="35" y="17.15" width="1.40" height="7.70"/></g><g class="mini-accent"><path d="M49 63 L49 35" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="48.02" y="29.4" width="1.96" height="1.40"/><rect x="47.04" y="30.8" width="3.92" height="1.40"/><rect x="46.13" y="32.2" width="5.74" height="1.40"/><rect x="45.15" y="33.6" width="7.70" height="1.40"/></g><g class="mini-ink"><path d="M21 63 L63 63" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="67.2" y="62.02" width="1.40" height="1.96"/><rect x="65.8" y="61.04" width="1.40" height="3.92"/><rect x="64.4" y="60.13" width="1.40" height="5.74"/><rect x="63" y="59.15" width="1.40" height="7.70"/></g></svg>
+          <span class="swatch-name">Quiet Current</span>
+          <span class="swatch-note">Dark &mdash; deep slate green</span>
+        </li>
+        <li class="swatch t-light">
+          <svg class="mini" viewBox="0 0 70 70" width="70" height="70" aria-hidden="true"><g class="mini-dots"><rect x="6.02" y="6.02" width="1.96" height="1.96"/><rect x="20.02" y="6.02" width="1.96" height="1.96"/><rect x="34.02" y="6.02" width="1.96" height="1.96"/><rect x="48.02" y="6.02" width="1.96" height="1.96"/><rect x="62.02" y="6.02" width="1.96" height="1.96"/><rect x="6.02" y="20.02" width="1.96" height="1.96"/><rect x="20.02" y="20.02" width="1.96" height="1.96"/><rect x="34.02" y="20.02" width="1.96" height="1.96"/><rect x="48.02" y="20.02" width="1.96" height="1.96"/><rect x="62.02" y="20.02" width="1.96" height="1.96"/><rect x="6.02" y="34.02" width="1.96" height="1.96"/><rect x="20.02" y="34.02" width="1.96" height="1.96"/><rect x="34.02" y="34.02" width="1.96" height="1.96"/><rect x="48.02" y="34.02" width="1.96" height="1.96"/><rect x="62.02" y="34.02" width="1.96" height="1.96"/><rect x="6.02" y="48.02" width="1.96" height="1.96"/><rect x="20.02" y="48.02" width="1.96" height="1.96"/><rect x="34.02" y="48.02" width="1.96" height="1.96"/><rect x="48.02" y="48.02" width="1.96" height="1.96"/><rect x="62.02" y="48.02" width="1.96" height="1.96"/><rect x="6.02" y="62.02" width="1.96" height="1.96"/><rect x="20.02" y="62.02" width="1.96" height="1.96"/><rect x="34.02" y="62.02" width="1.96" height="1.96"/><rect x="48.02" y="62.02" width="1.96" height="1.96"/><rect x="62.02" y="62.02" width="1.96" height="1.96"/></g><g class="mini-ink"><path d="M7 49 L7 21 L35 21" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="39.2" y="20.02" width="1.40" height="1.96"/><rect x="37.8" y="19.04" width="1.40" height="3.92"/><rect x="36.4" y="18.13" width="1.40" height="5.74"/><rect x="35" y="17.15" width="1.40" height="7.70"/></g><g class="mini-accent"><path d="M49 63 L49 35" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="48.02" y="29.4" width="1.96" height="1.40"/><rect x="47.04" y="30.8" width="3.92" height="1.40"/><rect x="46.13" y="32.2" width="5.74" height="1.40"/><rect x="45.15" y="33.6" width="7.70" height="1.40"/></g><g class="mini-ink"><path d="M21 63 L63 63" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="67.2" y="62.02" width="1.40" height="1.96"/><rect x="65.8" y="61.04" width="1.40" height="3.92"/><rect x="64.4" y="60.13" width="1.40" height="5.74"/><rect x="63" y="59.15" width="1.40" height="7.70"/></g></svg>
+          <span class="swatch-name">Quiet Current</span>
+          <span class="swatch-note">Light &mdash; porcelain sage</span>
+        </li>
+        <li class="swatch t-mocha">
+          <svg class="mini" viewBox="0 0 70 70" width="70" height="70" aria-hidden="true"><g class="mini-dots"><rect x="6.02" y="6.02" width="1.96" height="1.96"/><rect x="20.02" y="6.02" width="1.96" height="1.96"/><rect x="34.02" y="6.02" width="1.96" height="1.96"/><rect x="48.02" y="6.02" width="1.96" height="1.96"/><rect x="62.02" y="6.02" width="1.96" height="1.96"/><rect x="6.02" y="20.02" width="1.96" height="1.96"/><rect x="20.02" y="20.02" width="1.96" height="1.96"/><rect x="34.02" y="20.02" width="1.96" height="1.96"/><rect x="48.02" y="20.02" width="1.96" height="1.96"/><rect x="62.02" y="20.02" width="1.96" height="1.96"/><rect x="6.02" y="34.02" width="1.96" height="1.96"/><rect x="20.02" y="34.02" width="1.96" height="1.96"/><rect x="34.02" y="34.02" width="1.96" height="1.96"/><rect x="48.02" y="34.02" width="1.96" height="1.96"/><rect x="62.02" y="34.02" width="1.96" height="1.96"/><rect x="6.02" y="48.02" width="1.96" height="1.96"/><rect x="20.02" y="48.02" width="1.96" height="1.96"/><rect x="34.02" y="48.02" width="1.96" height="1.96"/><rect x="48.02" y="48.02" width="1.96" height="1.96"/><rect x="62.02" y="48.02" width="1.96" height="1.96"/><rect x="6.02" y="62.02" width="1.96" height="1.96"/><rect x="20.02" y="62.02" width="1.96" height="1.96"/><rect x="34.02" y="62.02" width="1.96" height="1.96"/><rect x="48.02" y="62.02" width="1.96" height="1.96"/><rect x="62.02" y="62.02" width="1.96" height="1.96"/></g><g class="mini-ink"><path d="M7 49 L7 21 L35 21" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="39.2" y="20.02" width="1.40" height="1.96"/><rect x="37.8" y="19.04" width="1.40" height="3.92"/><rect x="36.4" y="18.13" width="1.40" height="5.74"/><rect x="35" y="17.15" width="1.40" height="7.70"/></g><g class="mini-accent"><path d="M49 63 L49 35" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="48.02" y="29.4" width="1.96" height="1.40"/><rect x="47.04" y="30.8" width="3.92" height="1.40"/><rect x="46.13" y="32.2" width="5.74" height="1.40"/><rect x="45.15" y="33.6" width="7.70" height="1.40"/></g><g class="mini-ink"><path d="M21 63 L63 63" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="67.2" y="62.02" width="1.40" height="1.96"/><rect x="65.8" y="61.04" width="1.40" height="3.92"/><rect x="64.4" y="60.13" width="1.40" height="5.74"/><rect x="63" y="59.15" width="1.40" height="7.70"/></g></svg>
+          <span class="swatch-name">Catppuccin Mocha</span>
+          <span class="swatch-note">Dark &mdash; soothing pastel</span>
+        </li>
+        <li class="swatch t-latte">
+          <svg class="mini" viewBox="0 0 70 70" width="70" height="70" aria-hidden="true"><g class="mini-dots"><rect x="6.02" y="6.02" width="1.96" height="1.96"/><rect x="20.02" y="6.02" width="1.96" height="1.96"/><rect x="34.02" y="6.02" width="1.96" height="1.96"/><rect x="48.02" y="6.02" width="1.96" height="1.96"/><rect x="62.02" y="6.02" width="1.96" height="1.96"/><rect x="6.02" y="20.02" width="1.96" height="1.96"/><rect x="20.02" y="20.02" width="1.96" height="1.96"/><rect x="34.02" y="20.02" width="1.96" height="1.96"/><rect x="48.02" y="20.02" width="1.96" height="1.96"/><rect x="62.02" y="20.02" width="1.96" height="1.96"/><rect x="6.02" y="34.02" width="1.96" height="1.96"/><rect x="20.02" y="34.02" width="1.96" height="1.96"/><rect x="34.02" y="34.02" width="1.96" height="1.96"/><rect x="48.02" y="34.02" width="1.96" height="1.96"/><rect x="62.02" y="34.02" width="1.96" height="1.96"/><rect x="6.02" y="48.02" width="1.96" height="1.96"/><rect x="20.02" y="48.02" width="1.96" height="1.96"/><rect x="34.02" y="48.02" width="1.96" height="1.96"/><rect x="48.02" y="48.02" width="1.96" height="1.96"/><rect x="62.02" y="48.02" width="1.96" height="1.96"/><rect x="6.02" y="62.02" width="1.96" height="1.96"/><rect x="20.02" y="62.02" width="1.96" height="1.96"/><rect x="34.02" y="62.02" width="1.96" height="1.96"/><rect x="48.02" y="62.02" width="1.96" height="1.96"/><rect x="62.02" y="62.02" width="1.96" height="1.96"/></g><g class="mini-ink"><path d="M7 49 L7 21 L35 21" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="39.2" y="20.02" width="1.40" height="1.96"/><rect x="37.8" y="19.04" width="1.40" height="3.92"/><rect x="36.4" y="18.13" width="1.40" height="5.74"/><rect x="35" y="17.15" width="1.40" height="7.70"/></g><g class="mini-accent"><path d="M49 63 L49 35" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="48.02" y="29.4" width="1.96" height="1.40"/><rect x="47.04" y="30.8" width="3.92" height="1.40"/><rect x="46.13" y="32.2" width="5.74" height="1.40"/><rect x="45.15" y="33.6" width="7.70" height="1.40"/></g><g class="mini-ink"><path d="M21 63 L63 63" fill="none" stroke="currentColor" stroke-width="2.8000000000000003" stroke-linejoin="miter" stroke-linecap="butt"/><rect x="67.2" y="62.02" width="1.40" height="1.96"/><rect x="65.8" y="61.04" width="1.40" height="3.92"/><rect x="64.4" y="60.13" width="1.40" height="5.74"/><rect x="63" y="59.15" width="1.40" height="7.70"/></g></svg>
+          <span class="swatch-name">Catppuccin Latte</span>
+          <span class="swatch-note">Light &mdash; pastel sibling</span>
+        </li>
+      </ul>
+    </div>
   </section>
 
   <!-- ------------------------------------------------------------------ -->
   <!-- Closing                                                             -->
   <!-- ------------------------------------------------------------------ -->
   <section class="closer">
-    <p class="closer-line">Coming to Google Play for Android. iOS later.</p>
-    <p class="closer-sub">
-      Questions, or want to hear when it ships?
-      <a href="mailto:syahbes@gmail.com">syahbes@gmail.com</a>
-    </p>
+    <div class="wrap">
+      <p class="closer-line">Coming to Google Play for Android.</p>
+      <p class="closer-sub">
+        iOS later. Questions, or want to hear when it ships?
+        <a href="mailto:syahbes@gmail.com">syahbes@gmail.com</a>
+      </p>
+    </div>
   </section>
 
 </main>
@@ -151,11 +241,6 @@
       <a href="privacy-policy.html">Privacy policy</a>
       <a href="mailto:syahbes@gmail.com">syahbes@gmail.com</a>
     </nav>
-    <p class="footer-credits">
-      Type set in
-      <a href="https://fonts.google.com/specimen/Silkscreen">Silkscreen</a>
-      by Jason Kottke (OFL&nbsp;1.1).
-    </p>
     <p class="footer-copy">&copy; 2026 Shlomi Yahbes</p>
   </div>
 </footer>

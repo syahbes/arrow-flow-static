@@ -11,9 +11,8 @@ Served by GitHub Pages from `main` at the repository root.
 | --- | --- |
 | `index.html` | Landing page |
 | `privacy-policy.html` | The policy submitted to Play Console. Self-contained: its own inline styles, no dependency on the other files |
-| `styles.css` | Landing page styles. Palette mirrors the app's default *Quiet Current, dark* theme (`src/theme/palette.ts`) |
-| `fonts.css` | Silkscreen (Jason Kottke, OFL 1.1) embedded as a data URI, so the page makes no third-party requests |
-| `main.js` | The animated demo board in the hero. The arrowhead geometry is a port of `src/render/arrowhead.ts` from the app |
+| `styles.css` | Landing page styles, built from the app's design system: the palette is a transcription of `src/theme/palette.ts` (dark by default, light under `prefers-color-scheme`), the radii and type sizes come from `src/theme/tokens.ts`, and the buttons, cards and HUD restate the app's components. Flat throughout — a step in value is the only separation, no borders or shadows. No web fonts: the app sets everything in the platform sans, so the site does too |
+| `main.js` | The animated demo board in the hero phone. The arrowhead geometry is a port of `src/render/arrowhead.ts`; the colours are read off the page's CSS custom properties, so the board follows the theme |
 | `assets/` | App icon and favicon, copied from `arrow-flow/assets/images/` |
 
 ## Editing

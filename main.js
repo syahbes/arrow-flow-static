@@ -1,10 +1,12 @@
 /* ==========================================================================
    Arrow Flow — landing page demo board
 
-   Draws the same shapes the game draws: thin cream polylines on a dot
-   lattice, capped with a pixel-stepped arrowhead. The head geometry is a
-   direct port of src/render/arrowhead.ts in the app, so the arrows on this
-   page and the arrows in the game are literally the same drawing.
+   Draws what the game draws: thin ink polylines on a dot lattice, capped
+   with a pixel-stepped arrowhead. The head geometry is a direct port of
+   src/render/arrowhead.ts in the app, and the colours are read off the
+   page's CSS custom properties — which are themselves a transcription of
+   src/theme/palette.ts. So the board here and the board in the game are
+   literally the same drawing, in the same theme.
 
    The board is scripted, not solvable here: four arrows leave in the only
    order that works, because each one is blocked until the arrow crossing
@@ -17,19 +19,17 @@
   var canvas = document.getElementById('demo');
   if (!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
-  var counter = document.getElementById('demo-cleared');
+  var tapsOut = document.getElementById('demo-taps');
+  var progressOut = document.getElementById('demo-progress');
 
   /* -- board geometry ----------------------------------------------------- */
 
-  var GRID = 7;          // cells per side
-  var CELL = 24;         // px per cell, at 1x
-  var STROKE = 0.2;      // line width in grid units — matches STROKE in the app
-  var SIZE = GRID * CELL;
+  var GRID = 7;      // cells per side
+  var STROKE = 0.2;  // line width in grid units — matches STROKE in the app
 
-  var INK = '#e6ebe6';
-  var ACCENT = '#7cb8a4';
-  var BG = '#161b18';
-  var DOT = 'rgba(230,235,230,0.13)';
+  /* Set by fit(), from however wide the phone screen actually renders. */
+  var SIZE = 168;
+  var CELL = SIZE / GRID;
 
   /* Each arrow is a polyline through cell centres; the last point is the
      head. They are listed in the only order they can leave: the third is
@@ -40,6 +40,26 @@
     { pts: [[3, 6], [3, 4]] },           // exits up, freeing row 4
     { pts: [[6, 6], [6, 4], [4, 4]] }    // exits left
   ];
+
+  /* -- theme -------------------------------------------------------------- */
+
+  /* One source of truth: the page owns the palette, the canvas borrows it.
+     Falls back to Quiet Current dark if custom properties are unavailable. */
+  var theme = { ink: '#e6ebe6', accent: '#7cb8a4', bg: '#161b18', dot: 'rgba(230,235,230,0.13)' };
+
+  function readTheme() {
+    var s = window.getComputedStyle(document.documentElement);
+    function v(name, fallback) {
+      var got = s.getPropertyValue(name).trim();
+      return got || fallback;
+    }
+    theme = {
+      ink: v('--ink', theme.ink),
+      accent: v('--accent', theme.accent),
+      bg: v('--bg', theme.bg),
+      dot: v('--dot', theme.dot)
+    };
+  }
 
   /* -- polyline maths ----------------------------------------------------- */
 
@@ -116,11 +136,13 @@
   /** Grid units -> canvas px. Cell centres, so the board sits inset. */
   function px(u) { return (u + 0.5) * CELL; }
 
+  /* DotGrid.tsx draws a 0.14-unit square at every lattice point. */
   function drawDots() {
-    ctx.fillStyle = DOT;
+    var d = Math.max(2, Math.round(0.14 * CELL));
+    ctx.fillStyle = theme.dot;
     for (var y = 0; y < GRID; y++) {
       for (var x = 0; x < GRID; x++) {
-        ctx.fillRect(px(x) - 1, px(y) - 1, 2, 2);
+        ctx.fillRect(px(x) - d / 2, px(y) - d / 2, d, d);
       }
     }
   }
@@ -170,8 +192,14 @@
 
   function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
 
+  /** Mirrors the play screen's HUD: taps counted, rail filled by arrows gone. */
+  function setHud(taps, cleared) {
+    if (tapsOut) tapsOut.textContent = String(taps);
+    if (progressOut) progressOut.style.width = (cleared / plan.length) * 100 + '%';
+  }
+
   function render(index, phase, t) {
-    ctx.fillStyle = BG;
+    ctx.fillStyle = theme.bg;
     ctx.fillRect(0, 0, SIZE, SIZE);
     drawDots();
 
@@ -179,33 +207,43 @@
       if (i < index) continue;                       // already gone
       var p = plan[i];
       if (i > index || phase === 'tap') {
-        drawArrow(ARROWS[i].pts, p.dir, i === index ? ACCENT : INK);
+        drawArrow(ARROWS[i].pts, p.dir, i === index ? theme.accent : theme.ink);
       } else {
         var s = easeOut(t) * p.travel;
-        drawArrow(slice(p.path, s, s + p.len), p.dir, ACCENT);
+        drawArrow(slice(p.path, s, s + p.len), p.dir, theme.accent);
       }
     }
 
-    if (counter) counter.textContent = String(index);
+    setHud(Math.min(index + (phase === 'tap' && index < plan.length ? 1 : 0), plan.length), index);
   }
 
   var reduced = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* The canvas fills the phone screen, so its backing store is sized from the
+     rendered width rather than a fixed constant — CELL follows. */
   function fit() {
+    var css = canvas.clientWidth || SIZE;
     var dpr = Math.min(window.devicePixelRatio || 1, 3);
-    canvas.width = SIZE * dpr;
-    canvas.height = SIZE * dpr;
+    SIZE = css;
+    CELL = SIZE / GRID;
+    canvas.width = Math.round(SIZE * dpr);
+    canvas.height = Math.round(SIZE * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
+  readTheme();
   fit();
 
   if (reduced) {
     // The full board, held still. `fit` clears the canvas, so redraw after it.
-    var still = function () { fit(); render(0, 'tap', 0); };
+    var still = function () { readTheme(); fit(); render(0, 'tap', 0); setHud(0, 0); };
     still();
     window.addEventListener('resize', still);
+    if (window.matchMedia) {
+      var mqStill = window.matchMedia('(prefers-color-scheme: light)');
+      if (mqStill.addEventListener) mqStill.addEventListener('change', still);
+    }
     return;
   }
 
@@ -264,6 +302,12 @@
   }
 
   window.addEventListener('resize', fit);
+
+  /* Follow the OS between light and dark the way the app follows its setting. */
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: light)');
+    if (mq.addEventListener) mq.addEventListener('change', readTheme);
+  }
 
   play();
 })();

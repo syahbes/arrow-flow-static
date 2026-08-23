@@ -1,32 +1,76 @@
 /* ==========================================================================
-   Arrow Flow landing page
-   Palette mirrors the app's default "Quiet Current, dark" theme in
-   src/theme/palette.ts so the site and the game read as one thing.
-   Flat by design: value steps separate surfaces. No shadows anywhere.
+   Arrow Flow — landing page
+
+   The page is built from the app's own design system, not a lookalike:
+   the palette is a literal transcription of src/theme/palette.ts, the radii
+   and type sizes come from src/theme/tokens.ts, and the buttons, cards and
+   HUD are the same components the game renders, restated in CSS.
+
+   Two rules carry over from the app and explain most of what follows:
+     - Flat. A step in value is the ONLY separation between surfaces.
+       No shadows, no borders, no gradients.
+     - Weight does the work borders used to do.
    ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   Tokens — palette.ts + tokens.ts
+   -------------------------------------------------------------------------- */
+
 :root {
-  --bg:          #161b18;  /* app background */
-  --floor:       #212823;  /* subtle surfaces */
-  --panel:       #262e28;  /* cards, list rows */
-  --panel-border:#2d362f;  /* hairline rules, a notch off the bg */
-  --stone:       #323c35;  /* muted fill */
-  --ink:         #e6ebe6;  /* primary text and arrow lines */
-  --ink-dim:     #a3aea7;  /* secondary text */
-  --accent:      #7cb8a4;  /* river teal */
-  --on-accent:   #12201a;  /* text over the accent fill */
-  --star:        #d9aa54;  /* soft gold */
+  /* Quiet Current, dark — the app's default theme. */
+  --bg:        #161b18;
+  --floor:     #212823;
+  --panel:     #262e28;
+  --stone:     #323c35;
+  --sheet:     #242b26;
+  --ink:       #e6ebe6;
+  --ink-dim:   #a3aea7;
+  --accent:    #7cb8a4;
+  --on-accent: #12201a;
+  --heart:     #e0876a;
+  --star:      #d9aa54;
+  --dot:       rgba(230, 235, 230, 0.13);
 
-  --pixel: 'Silkscreen', 'Courier New', monospace;
-  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* The app sets everything in the platform's own humanist sans — SF Pro on
+     iOS, Roboto on Android. The web stack reaches the same faces. */
+  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
 
-  --measure: 1080px;
-  --gap: 20px;
+  /* radius scale, tokens.ts */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-pill: 999px;
+
+  --measure: 1040px;
+  --pad: 24px;
+}
+
+/* Quiet Current, light — the same river teal on a porcelain-sage ground. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:        #eef1ec;
+    --floor:     #e2e7e0;
+    --panel:     #ffffff;
+    --stone:     #e0e6df;
+    --sheet:     #ffffff;
+    --ink:       #333f39;
+    --ink-dim:   #5c6963;
+    --accent:    #3f6e60;
+    --on-accent: #f4f9f6;
+    --heart:     #c25f3f;
+    --star:      #b08a3a;
+    --dot:       rgba(51, 63, 57, 0.15);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark light;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -42,16 +86,18 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 17px;
-  line-height: 1.65;
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img { max-width: 100%; height: auto; display: block; }
-
 a { color: var(--accent); }
 
-/* The icon is pixel art — never let the browser smooth it. */
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+
+/* The app icon is pixel art — never let the browser smooth it. */
 .brand-icon, .hero-icon {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -61,35 +107,45 @@ a { color: var(--accent); }
   position: absolute;
   left: -9999px;
   top: 0;
+  z-index: 100;
   background: var(--accent);
   color: var(--on-accent);
-  padding: 8px 16px;
-  font-family: var(--pixel);
-  z-index: 100;
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-weight: 600;
+  text-decoration: none;
 }
-.skip-link:focus { left: 8px; top: 8px; }
+.skip-link:focus { left: 12px; top: 12px; }
 
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+  border-radius: var(--r-sm);
 }
+
+.tnum { font-variant-numeric: tabular-nums; }
 
 /* --------------------------------------------------------------------------
    Top bar
    -------------------------------------------------------------------------- */
 
+/* The bar is full-bleed so its ground covers what scrolls under it; the
+   measure lives on the inner row, lined up with every section below. */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 50;
+  background: var(--bg);
+}
+
+.topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 20px;
-  background: rgba(22, 27, 24, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--panel-border);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 14px var(--pad);
 }
 
 .brand {
@@ -100,34 +156,36 @@ a { color: var(--accent); }
   color: var(--ink);
 }
 
-.brand-icon { width: 32px; height: 32px; }
-
-.brand-name {
-  font-family: var(--pixel);
-  font-size: 17px;
-  letter-spacing: 0.04em;
+/* radius.sm on a 32px tile — the same corner the launcher gives it. */
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
 }
+
+.brand-name { font-size: 17px; font-weight: 600; }
+.brand-name em { font-style: normal; color: var(--accent); }
 
 .topnav {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-family: var(--pixel);
-  font-size: 12px;
+  gap: 2px;
+  font-size: 14px;
 }
 
 .topnav a {
   color: var(--ink-dim);
   text-decoration: none;
-  padding: 8px 10px;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  transition: color 140ms ease, background-color 140ms ease;
 }
+.topnav a:hover { color: var(--ink); background: var(--floor); }
 
-.topnav a:hover { color: var(--ink); }
-
-/* On narrow phones the section links crowd the bar; the privacy link is the
-   one that has to survive — it is what this site exists for. */
-@media (max-width: 520px) {
+/* On a narrow phone the section links crowd the bar. Privacy is the one that
+   has to survive — a store listing links straight to it. */
+@media (max-width: 560px) {
   .topnav a:not([href$="privacy-policy.html"]) { display: none; }
 }
 
@@ -135,23 +193,31 @@ a { color: var(--accent); }
    Shared section furniture
    -------------------------------------------------------------------------- */
 
-main > section {
+.band { background: var(--floor); }
+
+.wrap {
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 72px 20px;
+  padding: 84px var(--pad);
 }
 
+.section-head { margin-bottom: 40px; }
+
 .section-title {
-  font-family: var(--pixel);
-  font-size: clamp(19px, 3.2vw, 26px);
-  line-height: 1.45;
-  letter-spacing: 0.02em;
-  margin: 0 0 36px;
-  color: var(--ink);
+  font-size: clamp(24px, 3.4vw, 30px);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.section-sub {
+  margin: 10px 0 0;
+  color: var(--ink-dim);
+  font-size: 16px;
+  max-width: 56ch;
 }
 
 /* --------------------------------------------------------------------------
-   Buttons
+   Buttons — src/ui/Button.tsx, size="lg"
    -------------------------------------------------------------------------- */
 
 .btn {
@@ -160,36 +226,52 @@ main > section {
   align-items: center;
   justify-content: center;
   gap: 1px;
-  min-height: 54px;
-  padding: 10px 24px;
-  border: 1px solid transparent;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-family: var(--pixel);
+  min-height: 60px;
+  min-width: 44px;
+  padding: 16px 24px;
+  border: 0;
+  border-radius: var(--r-lg);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
   text-decoration: none;
-  letter-spacing: 0.04em;
-  transition: background-color 140ms ease, color 140ms ease;
+  cursor: pointer;
+  /* Sink, don't shadow: the press reads as the surface giving way. */
+  transition: transform 120ms ease, opacity 120ms ease, background-color 140ms ease;
 }
+.btn:active { transform: scale(0.97); opacity: 0.9; }
 
-.btn-sub { font-size: 10px; opacity: 0.8; }
-.btn-main { font-size: 16px; }
+.btn-primary { background: var(--accent); color: var(--on-accent); }
 
-/* The store link has nowhere to go until the app is published. It reads as a
-   badge, not as something you can press. */
+/* `--on-accent` is tuned for the accent fill; over stone it collapses, so the
+   secondary keeps `--ink`. Same note as Button.tsx. */
+.btn-secondary { background: var(--stone); color: var(--ink); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-dim);
+  font-weight: 500;
+}
+.btn-ghost:hover { background: var(--floor); color: var(--ink); }
+
+/* The store button has nowhere to go until the app is published, so it takes
+   the app's off-state language: the secondary fill, not pressable. It is NOT
+   faded — this is the line that says where the game ships, and Button.tsx's
+   0.6 is for controls that do nothing, not for text that has to be read. */
 .btn.is-inert {
   background: var(--stone);
-  color: var(--ink-dim);
-  border-color: var(--panel-border);
+  color: var(--ink);
   cursor: default;
 }
+.btn.is-inert:active { transform: none; opacity: 1; }
+.btn.is-inert .btn-sub { color: var(--ink-dim); opacity: 1; }
 
-.btn-outline {
-  background: transparent;
-  border-color: var(--stone);
-  color: var(--accent);
-  font-size: 14px;
+.btn-sub {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
 }
-.btn-outline:hover { background: var(--floor); }
 
 /* --------------------------------------------------------------------------
    Hero
@@ -199,161 +281,224 @@ main > section {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   align-items: center;
-  gap: 48px;
-  padding-top: 64px !important;
-  padding-bottom: 88px !important;
+  gap: 56px;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 40px var(--pad) 96px;
 }
 
-/* 128px is 1024/8 — an exact divisor of the source, so every art pixel lands
-   on the same number of screen pixels. Off-ratio sizes visibly ripple.
-   The icon carries its own near-black ground, a shade off this page's; the
-   hairline makes that read as a deliberate tile rather than a stray patch. */
+/* 96px is 1024/32 wide at radius.xl — an exact divisor of the source art, so
+   every drawn pixel lands on the same number of screen pixels. */
 .hero-icon {
-  width: 128px;
-  height: 128px;
-  margin-bottom: 22px;
-  border: 1px solid var(--panel-border);
+  width: 96px;
+  height: 96px;
+  border-radius: var(--r-xl);
+  margin-bottom: 24px;
 }
 
+/* fontSize.display, weight semibold — the home-screen wordmark. */
 .hero-title {
-  font-family: var(--pixel);
-  font-size: clamp(38px, 6.6vw, 60px);
-  line-height: 1.1;
-  letter-spacing: 0.02em;
+  font-size: clamp(40px, 7vw, 64px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
   margin: 0;
 }
+.hero-title em { font-style: normal; color: var(--accent); }
 
 .hero-tagline {
-  font-family: var(--pixel);
-  font-size: clamp(12px, 2vw, 15px);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
   margin: 14px 0 0;
+  font-size: 17px;
+  color: var(--ink-dim);
 }
 
 .hero-lede {
-  max-width: 46ch;
+  max-width: 44ch;
+  margin: 24px 0 0;
+  font-size: 17px;
   color: var(--ink-dim);
-  margin: 22px 0 0;
 }
 
 .cta-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: stretch;
-  gap: 14px;
+  gap: 12px;
   margin-top: 32px;
 }
 
-.hero-badges {
+/* The chips reuse the settings-screen tile: a floor-filled pill, caption type,
+   no border. */
+.hero-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 20px;
+  gap: 8px;
   list-style: none;
   margin: 28px 0 0;
   padding: 0;
-  font-family: var(--pixel);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
 }
 
-.hero-badges li::before {
-  content: '\2022';
-  color: var(--accent);
-  margin-right: 8px;
-}
-
-/* -- the live board demo -- */
-
-/* Hug the board rather than stretching the grid column — otherwise the frame
-   sits far wider than the canvas inside it. */
-.hero-demo {
-  width: max-content;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.demo-frame {
-  border: 1px solid var(--panel-border);
+.hero-chips li {
   background: var(--floor);
-  padding: 16px;
+  color: var(--ink-dim);
+  border-radius: var(--r-pill);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-/* 336px = the 168px board at exactly 2x. */
-#demo {
-  width: 336px;
+@media (prefers-color-scheme: light) {
+  /* On the light theme `--floor` sits below `--bg`; the chips would recede
+     into the page. The panel is the raised surface there. */
+  .hero-chips li { background: var(--panel); }
+}
+
+/* -- the phone, and the board playing inside it -- */
+
+.hero-device { justify-self: center; }
+
+/* The device is one flat panel with a screen cut out of it — the value step
+   between panel and bg is the whole frame. */
+.device {
+  width: 304px;
   max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
+  background: var(--panel);
+  border-radius: 44px;
+  padding: 12px;
 }
 
-.demo-caption {
+.device-screen {
   display: flex;
+  flex-direction: column;
+  /* Phone proportions, so the screen reads as a device and not a card. */
+  min-height: 460px;
+  background: var(--bg);
+  border-radius: 33px;
+  overflow: hidden;
+  /* paddingHorizontal: 14 — the play screen's own inset. */
+  padding: 10px 14px 14px;
+}
+
+/* boardwrap: { flex: 1 } — the board takes the room the HUD leaves. */
+.boardwrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* ProgressBar.tsx: a 4px rail, deliberately low-contrast, run edge to edge by
+   cancelling the screen's horizontal padding. */
+.hud-rail {
+  height: 4px;
+  margin: 0 -14px;
+  background: var(--floor);
+  overflow: hidden;
+}
+.hud-rail span {
+  display: block;
+  height: 4px;
+  width: 0;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 260ms cubic-bezier(0.33, 0, 0.67, 1);
+}
+
+.hud {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-top: 14px;
-  font-family: var(--pixel);
+  padding: 12px 2px;
+}
+
+.hud-left { display: flex; align-items: center; gap: 6px; }
+
+/* One shared box, so the row aligns on geometry rather than glyph metrics. */
+.hud-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-dim);
+}
+.hud-icon:first-child { color: var(--ink); }
+.hud-icon svg { width: 24px; height: 24px; display: block; }
+
+.hud-center { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+.hud-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+.hud-hearts { display: flex; gap: 4px; color: var(--heart); font-size: 15px; line-height: 1; }
+
+.hud-meta {
+  margin: 0;
   font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  line-height: 1.45;
+  color: var(--ink-dim);
+  text-align: right;
+  white-space: nowrap;
+}
+.hud-meta b { font-weight: 400; color: var(--accent); }
+
+#demo {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 4px 0;
+}
+
+.device-caption {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 13px;
   color: var(--ink-dim);
 }
 
-.demo-count { color: var(--star); font-variant-numeric: tabular-nums; }
-
-@media (max-width: 860px) {
+@media (max-width: 880px) {
   .hero {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 48px;
     text-align: center;
+    padding-bottom: 72px;
   }
-  .hero-icon { margin-left: auto; margin-right: auto; }
-  .hero-lede { margin-left: auto; margin-right: auto; }
-  .cta-row, .hero-badges { justify-content: center; }
+  .hero-icon, .hero-lede { margin-left: auto; margin-right: auto; }
+  .cta-row, .hero-chips { justify-content: center; }
 }
 
 /* --------------------------------------------------------------------------
    Rules
    -------------------------------------------------------------------------- */
 
-.rules {
-  border-top: 1px solid var(--panel-border);
-  border-bottom: 1px solid var(--panel-border);
-}
-
 .rules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 32px var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
 }
 
 .rule {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  background: var(--panel);
+  border-radius: var(--r-lg);
+  padding: 22px;
 }
 
+/* Tabular so the three numerals share a width and the cards line up. */
 .rule-num {
-  font-family: var(--pixel);
-  font-size: 20px;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--accent);
-  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 12px;
 }
 
-.rule p { margin: 0; color: var(--ink-dim); font-size: 16px; }
+.rule h3 { margin: 0 0 8px; font-size: 17px; }
+.rule p { margin: 0; font-size: 15px; color: var(--ink-dim); }
 
 /* --------------------------------------------------------------------------
-   Features
+   Features — the settings-screen card, one per claim
    -------------------------------------------------------------------------- */
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 16px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -361,77 +506,94 @@ main > section {
 
 .card {
   background: var(--panel);
-  padding: 26px 24px;
+  border-radius: var(--r-lg);
+  padding: 22px;
 }
 
-.card h3 {
-  font-family: var(--pixel);
-  font-size: 14px;
-  line-height: 1.55;
-  letter-spacing: 0.02em;
-  margin: 0 0 12px;
-  color: var(--ink);
-}
+.card h3 { margin: 0 0 6px; font-size: 16px; }
+.card p { margin: 0; font-size: 15px; color: var(--ink-dim); }
 
-.card p {
+/* --------------------------------------------------------------------------
+   Themes — the four palettes the game actually ships, each swatch painted in
+   its own colours rather than described in the page's.
+   -------------------------------------------------------------------------- */
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  list-style: none;
   margin: 0;
-  font-size: 15px;
-  color: var(--ink-dim);
+  padding: 0;
 }
+
+.swatch {
+  background: var(--t-bg);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  color: var(--t-ink);
+}
+
+/* A board three arrows wide, drawn from the same geometry the game uses, in
+   each theme's own ink, accent and dot. The palette is shown, not described. */
+.mini {
+  display: block;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 16px;
+}
+.mini-dots  { fill: var(--t-dot); }
+.mini-ink    { color: var(--t-ink);    fill: var(--t-ink); }
+.mini-accent { color: var(--t-accent); fill: var(--t-accent); }
+
+.swatch-name { font-size: 15px; font-weight: 600; }
+.swatch-note { display: block; font-size: 13px; color: var(--t-dim); margin-top: 2px; }
+
+.t-dark  { --t-bg: #161b18; --t-ink: #e6ebe6; --t-dim: #a3aea7; --t-accent: #7cb8a4; --t-dot: rgba(230,235,230,0.13); }
+.t-light { --t-bg: #eef1ec; --t-ink: #333f39; --t-dim: #5c6963; --t-accent: #3f6e60; --t-dot: rgba(51,63,57,0.15); }
+.t-mocha { --t-bg: #1e1e2e; --t-ink: #cdd6f4; --t-dim: #aeb6d1; --t-accent: #f9e2af; --t-dot: rgba(205,214,244,0.13); }
+.t-latte { --t-bg: #eff1f5; --t-ink: #4c4f69; --t-dim: #5c5f77; --t-accent: #df8e1d; --t-dot: rgba(76,79,105,0.16); }
 
 /* --------------------------------------------------------------------------
    Closing
    -------------------------------------------------------------------------- */
 
-.closer {
-  text-align: center;
-  border-top: 1px solid var(--panel-border);
-}
+.closer { text-align: center; }
 
 .closer-line {
-  font-family: var(--pixel);
-  font-size: clamp(14px, 2.4vw, 19px);
-  line-height: 1.6;
-  margin: 0 0 16px;
+  font-size: clamp(22px, 3.2vw, 28px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0 auto;
+  max-width: 22ch;
 }
 
 .closer-sub {
-  margin: 0;
+  margin: 16px auto 0;
+  max-width: 46ch;
   color: var(--ink-dim);
-  font-size: 15px;
 }
 
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
 
-.footer {
-  border-top: 1px solid var(--panel-border);
-  background: var(--floor);
-}
+.footer { background: var(--floor); }
 
 .footer-inner {
   max-width: var(--measure);
   margin: 0 auto;
-  padding: 40px 20px 56px;
-}
-
-.footer-links {
+  padding: 40px var(--pad) 56px;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 28px;
-  font-family: var(--pixel);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  margin-bottom: 24px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 32px;
 }
 
-.footer-links a { color: var(--ink); text-decoration: none; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 15px; }
+.footer-links a { color: var(--ink); text-decoration: none; font-weight: 500; }
 .footer-links a:hover { color: var(--accent); }
 
-.footer-credits,
-.footer-copy {
-  margin: 0 0 8px;
-  font-size: 13px;
-  color: var(--ink-dim);
-}
+.footer-copy { margin: 0; font-size: 14px; color: var(--ink-dim); }
