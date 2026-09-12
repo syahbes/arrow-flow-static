@@ -255,18 +255,6 @@ h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
 }
 .btn-ghost:hover { background: var(--floor); color: var(--ink); }
 
-/* The store button has nowhere to go until the app is published, so it takes
-   the app's off-state language: the secondary fill, not pressable. It is NOT
-   faded — this is the line that says where the game ships, and Button.tsx's
-   0.6 is for controls that do nothing, not for text that has to be read. */
-.btn.is-inert {
-  background: var(--stone);
-  color: var(--ink);
-  cursor: default;
-}
-.btn.is-inert:active { transform: none; opacity: 1; }
-.btn.is-inert .btn-sub { color: var(--ink-dim); opacity: 1; }
-
 .btn-sub {
   font-size: 12px;
   font-weight: 500;
